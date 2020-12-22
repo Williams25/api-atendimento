@@ -1,8 +1,7 @@
-const { Router } = require('express')
-const routes = Router()
+const { router } = require('../middlewares/express')
 const atendimento = require('../controllers/atendimentos')
 
-routes.get('/', atendimento.index)
-routes.post('/', atendimento.create)
+router.get('/', atendimento.index)
+router.post('/', atendimento.create)
 
-module.exports = routes
+module.exports = router

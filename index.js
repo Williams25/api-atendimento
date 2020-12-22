@@ -1,8 +1,8 @@
-const { app, bodyParser, errorHandle, controllerRoutes } = require('./modules')
+const { app, bodyParser, errorHandle, controllerRoutes } = require('./server-modules')
 const porta = process.env.PORTA
 
 bodyParser(app)
-app.use(controllerRoutes)
+controllerRoutes(app)
 errorHandle(app)
 
 app.listen(porta, () => console.log(`http://${process.env.LOCAL}:${porta}`))
