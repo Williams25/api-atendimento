@@ -1,8 +1,19 @@
 const { app, bodyParser, errorHandle, controllerRoutes } = require('./server-modules')
+const conexao = require('./src/database/conexao')
+const Tabelas = require('./src/database/tabelas')
 const porta = process.env.PORTA
 
-bodyParser(app)
-controllerRoutes(app)
-errorHandle(app)
+conexao.connect(erro => {
+  if (erro) {
+    console.log('falha na conexão')
+  } else {
 
-app.listen(porta, () => console.log(`http://${process.env.LOCAL}:${porta}`))
+    Tabelas.init(conexao)
+
+    bodyParser(app)
+    controllerRoutes(app)
+    errorHandle(app)
+
+    app.listen(porta, () => console.log(`http://${process.env.LOCAL}:${porta}`))
+  }
+})
