@@ -1,4 +1,6 @@
-const { router } = require('../middlewares/express')
+const { Router } = require('express')
+const router = Router()
+
 const atendimento = require('../controllers/atendimentos')
 
 router.get('/', atendimento.index)

@@ -2,6 +2,7 @@ class Tabelas {
   init(conexao) {
     this.conexao = conexao
     this.atendimentos()
+    this.pets()
   }
 
   atendimentos() {
@@ -16,9 +17,26 @@ class Tabelas {
       DATA_CRIACAO DATETIME NOT NULL,
       PRIMARY KEY (ID)
     )`
+
     this.conexao.query(sql, (erro) => {
       if (erro) console.log(erro)
       console.log('Tabela atendimentos criada')
+    })
+  }
+
+  pets() {
+    const sql = `CREATE TABLE IF NOT EXISTS PETS (
+      ID INT NOT NULL AUTO_INCREMENT,
+      ID_ATENDIMENTO INT,
+      NOME VARCHAR(100),
+      IMAGEM VARCHAR(200),
+      PRIMARY KEY (ID),
+      CONSTRAINT FK_ATENDIMENTO FOREIGN KEY (ID_ATENDIMENTO) REFERENCES ATENDIMENTOS (ID)
+    )`
+
+    this.conexao.query(sql, (erro) => {
+      if (erro) console.log(erro)
+      console.log('Tabela pets criada')
     })
   }
 }
