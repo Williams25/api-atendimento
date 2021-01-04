@@ -1,8 +1,9 @@
 const conexao = require('../database/conexao')
 const moment = require('moment')
+const repository = require('../repository/atendimento')
 
 class Atendimento {
-  create(atendimento, res) {
+  async create(atendimento) {
     const data_criacao = moment().format('YYYY-MM-DD HH:mm:ss')
     const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss')
     const dataValida = moment(data).isSameOrAfter(data_criacao)
@@ -18,45 +19,31 @@ class Atendimento {
     const errors = validacao.filter(campo => !campo.valido)
 
     if (errors.length > 0) {
-      return res.status(400).json(errors)
+      return new Promise((resolve, reject) => {
+        reject(errors)
+      })
     } else {
       const dataAtendimento = { ...atendimento, data_criacao, data }
-      const sql = `INSERT  INTO ATENDIMENTOS SET ?`
-      conexao.query(sql, dataAtendimento, (erro, result) => {
-        if (erro) {
-          return res.status(400).json(erro)
-        } else {
-          return res.status(201).json({ message: 'Atendimento criado' })
-        }
-      })
+
+      return await repository.create(dataAtendimento).then(() => {
+        return { message: 'Atendimento criado', atendimento: dataAtendimento }
+      }).catch(err => err.message)
     }
   }
 
-  index(res) {
-    const sql = `SELECT * FROM ATENDIMENTOS`
-    conexao.query(sql, (erro, result) => {
-      if (erro) {
-        return res.status(400).json(erro)
-      } else {
-        return res.status(200).json(result)
-      }
-    })
+  async index() {
+    return await repository.index().then(result => {
+      return result
+    }).catch(err => err.message)
   }
 
-  findID(id, res) {
-    const sql = `SELECT * FROM ATENDIMENTOS WHERE ID = ?`
-    conexao.query(sql, id, (erro, result) => {
-      if (erro) {
-        return res.status(404).json(erro)
-      } else {
-        return res.status(200).json(result[0])
-      }
-    })
+  async findID(id) {
+    return await repository.findID(id).then(result => {
+      return result
+    }).catch(err => err.message)
   }
 
-  update(atendimento, res) {
-    const sql = `UPDATE ATENDIMENTOS SET ? WHERE ID = ?`
-
+  async update(atendimento) {
     const data_criacao = moment().format('YYYY-MM-DD HH:mm:ss')
     const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss')
     const dataValida = moment(data).isSameOrAfter(data_criacao)
@@ -72,27 +59,20 @@ class Atendimento {
     const errors = validacao.filter(campo => !campo.valido)
 
     if (errors.length > 0) {
-      return res.status(400).json(errors)
-    } else {
-      conexao.query(sql, [atendimento, atendimento.id], (erro, result) => {
-        if (erro) {
-          return res.status(400).json(erro)
-        } else {
-          return res.status(200).json({ message: 'Atendimento alterado' })
-        }
+      return new Promise((resolve, reject) => {
+        reject(errors)
       })
+    } else {
+      return await repository.update(atendimento).then(() => {
+        return { message: 'Atendimento alterado' }
+      }).catch(err => err.message)
     }
   }
 
-  delete(id, res) {
-    const sql = `DELETE FROM ATENDIMENTOS WHERE ID = ?`
-    conexao.query(sql, id, (erro, result) => {
-      if (erro) {
-        return res.status(404).json(erro)
-      } else {
-        return res.status(200).json({ message: 'Atendimento apagado' })
-      }
-    })
+  async delete(id) {
+    return await repository.delete(id).then(result => {
+      return { message: 'Atendimento apagado' }
+    }).catch(err => err.message)
   }
 }
 
